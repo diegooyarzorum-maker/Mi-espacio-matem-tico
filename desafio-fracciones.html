@@ -1,1 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Gran Desafío de Fracciones</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.juego {
+    max-width: 850px;
+    margin: auto;
+    text-align: center;
+}
+
+.nivel {
+    display: inline-block;
+    padding: 8px 18px;
+    border-radius: 20px;
+    background: #e0e7ff;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.barra-fondo {
+    height: 20px;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 20px 0 30px;
+}
+
+.barra-progreso {
+    height: 100%;
+    width: 0%;
+    background: #4f46e5;
+    transition: width 0.4s;
+}
+
+.figura-fraccion {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 5px solid #333;
+    margin: 25px auto;
+}
+
+.opciones {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 25px 0;
+}
+
+.opcion {
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    min-width: 120px;
+}
+
+.opcion:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.fracciones-comparar {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    margin: 30px 0;
+}
+
+.fraccion-grande {
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.recta {
+    position: relative;
+    max-width: 600px;
+    height: 100px;
+    margin: 40px auto;
+}
+
+.linea {
+    position: absolute;
+    top: 35px;
+    left: 5%;
+    width: 90%;
+    height: 5px;
+    background: #333;
+}
+
+.puntos {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5%;
+}
+
+.punto {
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+#retroalimentacion {
+    min-height: 70px;
+    margin-top: 20px;
+}
+
+.resultado {
+    font-size: 23px;
+    line-height: 1.6;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🏆 Gran Desafío de Fracciones</h1>
+    <p>Representa, compara, descubre equivalencias y usa la recta numérica.</p>
+</header>
+
+<main class="contenedor">
+
+<div class="tarjeta juego" id="juego">
+
+    <div class="nivel" id="nivel"></div>
+
+    <h3 id="contador"></h3>
+
+    <p id="puntaje">⭐ Puntaje: 0</p>
+
+    <div class="barra-fondo">
+        <div class="barra-progreso" id="barra"></div>
+    </div>
+
+    <h2 id="pregunta"></h2>
+
+    <div id="contenido"></div>
+
+    <div class="opciones" id="opciones"></div>
+
+    <h2 id="retroalimentacion"></h2>
+
+    <button
+        id="siguiente"
+        class="boton"
+        onclick="siguiente()"
+        style="display:none;">
+        Siguiente ➡️
+    </button>
+
+</div>
+
+</main>
+
+<script>
+
+const preguntas = [
+
+{
+tipo: "comparar",
+nivel: "🟡 Nivel: Comparar",
+pregunta: "¿Cuál fracción es mayor?",
+a: [1,2],
+b: [1,4],
+opciones: ["1/2","1/4"],
+correcta: "1/2",
+explicacion: "1/2 es mayor que 1/4."
+},
+
+{
+tipo: "comparar",
+nivel: "🟡 Nivel: Comparar",
+pregunta: "¿Cuál fracción es mayor?",
+a: [1,3],
+b: [2,3],
+opciones: ["1/3","2/3"],
+correcta: "2/3",
+explicacion: "Cuando el denominador es igual, la fracción con mayor numerador representa una cantidad mayor."
+},
+
+{
+tipo: "representar",
+nivel: "🟢 Nivel: Representar",
+pregunta: "¿Qué fracción está representada?",
+fraccion: [3,4],
+opciones: ["1/4","2/4","3/4"],
+correcta: "3/4",
+explicacion: "Hay 4 partes iguales y 3 están coloreadas."
+},
+
+{
+tipo: "representar",
+nivel: "🟢 Nivel: Representar",
+pregunta: "¿Qué fracción está representada?",
+fraccion: [2,3],
+opciones: ["1/3","2/3","3/3"],
+correcta: "2/3",
+explicacion: "El entero está dividido en 3 partes iguales y 2 están coloreadas."
+},
+
+{
+tipo: "equivalencia",
+nivel: "🟠 Nivel: Equivalencias",
+pregunta: "¿Cuál fracción es equivalente a 1/2?",
+opciones: ["1/4","2/4","3/4"],
+correcta: "2/4",
+explicacion: "1/2 y 2/4 representan la misma cantidad del entero."
+},
+
+{
+tipo: "equivalencia",
+nivel: "🟠 Nivel: Equivalencias",
+pregunta: "¿Cuál fracción es equivalente a 2/4?",
+opciones: ["1/2","1/3","3/4"],
+correcta: "1/2",
+explicacion: "2/4 representa la misma cantidad que 1/2."
+},
+
+{
+tipo: "recta",
+nivel: "🔵 Nivel: Recta numérica",
+pregunta: "¿En qué punto se encuentra 1/2?",
+marcas: ["0","1/4","1/2","3/4","1"],
+opciones: ["1/4","1/2","3/4"],
+correcta: "1/2",
+explicacion: "1/2 está exactamente a la mitad entre 0 y 1."
+},
+
+{
+tipo: "recta",
+nivel: "🔵 Nivel: Recta numérica",
+pregunta: "¿En qué punto se encuentra 3/4?",
+marcas: ["0","1/4","1/2","3/4","1"],
+opciones: ["1/4","1/2","3/4"],
+correcta: "3/4",
+explicacion: "3/4 se ubica después de 1/2 y antes de 1."
+}
+
+];
+
+let actual = 0;
+let puntaje = 0;
+let respondida = false;
+
+function circulo(numerador, denominador) {
+
+    const grados = (numerador / denominador) * 360;
+
+    return `
+        <div
+        class="figura-fraccion"
+        style="
+        background:
+        conic-gradient(
+        #f59e0b 0deg ${grados}deg,
+        white ${grados}deg 360deg
+        );">
+        </div>
+    `;
+}
+
+function mostrarPregunta() {
+
+    respondida = false;
+
+    const p = preguntas[actual];
+
+    document.getElementById("nivel").innerHTML = p.nivel;
+
+    document.getElementById("contador").innerHTML =
+        `Pregunta ${actual + 1} de ${preguntas.length}`;
+
+    document.getElementById("pregunta").innerHTML =
+        p.pregunta;
+
+    document.getElementById("retroalimentacion").innerHTML = "";
+
+    document.getElementById("siguiente").style.display = "none";
+
+    const progreso =
+        ((actual + 1) / preguntas.length) * 100;
+
+    document.getElementById("barra").style.width =
+        progreso + "%";
+
+    let contenido = "";
+
+    if (p.tipo === "comparar") {
+
+        contenido = `
+        <div class="fracciones-comparar">
+
+            <div>
+                ${circulo(p.a[0],p.a[1])}
+                <div class="fraccion-grande">
+                    ${p.a[0]}/${p.a[1]}
+                </div>
+            </div>
+
+            <div>
+                ${circulo(p.b[0],p.b[1])}
+                <div class="fraccion-grande">
+                    ${p.b[0]}/${p.b[1]}
+                </div>
+            </div>
+
+        </div>
+        `;
+    }
+
+    if (p.tipo === "representar") {
+
+        contenido =
+            circulo(p.fraccion[0],p.fraccion[1]);
+    }
+
+    if (p.tipo === "equivalencia") {
+
+        contenido = `
+            <div style="font-size:60px; margin:30px;">
+                🤔
+            </div>
+        `;
+    }
+
+    if (p.tipo === "recta") {
+
+        contenido = `
+        <div class="recta">
+
+            <div class="linea"></div>
+
+            <div class="puntos">
+
+                ${p.marcas.map(m =>
+                    `<div class="punto">|<br>${m}</div>`
+                ).join("")}
+
+            </div>
+
+        </div>
+        `;
+    }
+
+    document.getElementById("contenido").innerHTML =
+        contenido;
+
+    document.getElementById("opciones").innerHTML =
+        p.opciones.map(opcion =>
+
+        `<button
+        class="boton opcion"
+        onclick="responder('${opcion}')">
+        ${opcion}
+        </button>`
+
+        ).join("");
+}
+
+function responder(respuesta) {
+
+    if (respondida) return;
+
+    respondida = true;
+
+    const p = preguntas[actual];
+
+    if (respuesta === p.correcta) {
+
+        puntaje++;
+
+        document.getElementById("retroalimentacion").innerHTML =
+            "🎉 ¡Correcto! " + p.explicacion;
+
+    } else {
+
+        document.getElementById("retroalimentacion").innerHTML =
+            "💡 Aún no. " + p.explicacion;
+    }
+
+    document.getElementById("puntaje").innerHTML =
+        `⭐ Puntaje: ${puntaje}`;
+
+    document.querySelectorAll(".opcion")
+        .forEach(boton => boton.disabled = true);
+
+    document.getElementById("siguiente").style.display =
+        "inline-block";
+
+    if (actual === preguntas.length - 1) {
+
+        document.getElementById("siguiente").innerHTML =
+            "Ver resultado 🏆";
+    }
+}
+
+function siguiente() {
+
+    actual++;
+
+    if (actual < preguntas.length) {
+
+        mostrarPregunta();
+
+    } else {
+
+        finalizar();
+    }
+}
+
+function finalizar() {
+
+    let mensaje;
+    let emoji;
+
+    if (puntaje >= 7) {
+
+        emoji = "🏆";
+        mensaje =
+            "¡Excelente trabajo! Demuestras un gran dominio de las fracciones.";
+
+    } else if (puntaje >= 5) {
+
+        emoji = "👏";
+        mensaje =
+            "¡Muy buen trabajo! Estás avanzando muy bien.";
+
+    } else {
+
+        emoji = "💪";
+        mensaje =
+            "¡Buen esfuerzo! Sigue practicando y observa con atención las representaciones.";
+    }
+
+    document.getElementById("juego").innerHTML = `
+
+        <div class="resultado">
+
+            <h1>${emoji}</h1>
+
+            <h1>Desafío completado</h1>
+
+            <h2>
+                ${puntaje} de ${preguntas.length} puntos
+            </h2>
+
+            <p>${mensaje}</p>
+
+            <button
+            class="boton"
+            onclick="location.reload()">
+                🔄 Intentar nuevamente
+            </button>
+
+            <br><br>
+
+            <a
+            href="index.html"
+            class="boton">
+                🏠 Volver al inicio
+            </a>
+
+        </div>
+    `;
+}
+
+mostrarPregunta();
+
+</script>
+
+</body>
+</html>
