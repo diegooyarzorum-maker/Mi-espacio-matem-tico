@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fracciones | Mi Espacio de Matemática</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>🍕 Desafío de Fracciones</h1>
+        <p>Observa, piensa y selecciona tu respuesta.</p>
+    </header>
+
+    <main class="contenedor">
+
+        <div class="tarjeta">
+
+            <div class="emoji">🤔</div>
+
+            <h2>¿Cuál fracción es mayor?</h2>
+
+            <p>Imagina dos pizzas del mismo tamaño.</p>
+
+            <h1>1/2 &nbsp;&nbsp;&nbsp; VS &nbsp;&nbsp;&nbsp; 1/4</h1>
+
+            <button class="boton"
+                onclick="respuestaCorrecta()">
+                1/2
+            </button>
+
+            <button class="boton"
+                onclick="respuestaIncorrecta()">
+                1/4
+            </button>
+
+            <h2 id="resultado"></h2>
+
+        </div>
+
+        <p style="text-align:center; margin-top:30px;">
+            <a href="index.html" class="boton">
+                🏠 Volver al inicio
+            </a>
+        </p>
+
+    </main>
+
+    <script>
+
+        function respuestaCorrecta() {
+            document.getElementById("resultado").innerHTML =
+            "🎉 ¡Muy bien! 1/2 es mayor que 1/4.";
+        }
+
+        function respuestaIncorrecta() {
+            document.getElementById("resultado").innerHTML =
+            "💡 Inténtalo nuevamente. Piensa cuál pizza tendría trozos más grandes.";
+        }
+
+    </script>
+
+</body>
+
+</html>
