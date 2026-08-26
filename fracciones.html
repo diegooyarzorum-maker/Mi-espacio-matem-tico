@@ -5,20 +5,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Fracciones | Mi Espacio de Matemática</title>
+    <title>Quiz de Fracciones</title>
 
     <link rel="stylesheet" href="style.css">
 
     <style>
-        .fracciones-visuales {
-            display: flex;
-            justify-content: center;
-            gap: 60px;
-            flex-wrap: wrap;
-            margin: 30px 0;
+        .quiz {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
         }
 
-        .opcion-fraccion {
+        .barra-contenedor {
+            width: 100%;
+            height: 22px;
+            background-color: #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .barra {
+            height: 100%;
+            width: 20%;
+            background-color: #4f46e5;
+            transition: width 0.4s;
+        }
+
+        .fracciones {
+            display: flex;
+            justify-content: center;
+            gap: 70px;
+            flex-wrap: wrap;
+            margin: 35px 0;
+        }
+
+        .opcion {
             text-align: center;
         }
 
@@ -30,101 +52,357 @@
             margin: 0 auto 15px;
         }
 
-        .mitad {
-            background: linear-gradient(
-                90deg,
-                #f59e0b 50%,
-                white 50%
-            );
+        .fraccion {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 15px;
         }
 
-        .cuarto {
-            background: conic-gradient(
-                #4f46e5 0deg 90deg,
-                white 90deg 360deg
-            );
+        .boton-respuesta {
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
         }
 
-        .fraccion-grande {
-            font-size: 32px;
+        #mensaje {
+            min-height: 65px;
+            margin-top: 25px;
+        }
+
+        #puntaje {
+            font-size: 22px;
             font-weight: bold;
         }
 
-        #resultado {
-            min-height: 60px;
-            margin-top: 30px;
+        .resultado-final {
+            font-size: 24px;
+            line-height: 1.6;
         }
     </style>
 </head>
 
 <body>
 
-    <header>
-        <h1>🍕 Desafío de Fracciones</h1>
-        <p>Observa las representaciones y selecciona la fracción mayor.</p>
-    </header>
+<header>
+    <h1>🍕 Quiz de Fracciones</h1>
+    <p>Observa, compara y selecciona la fracción mayor.</p>
+</header>
 
-    <main class="contenedor">
+<main class="contenedor">
 
-        <div class="tarjeta">
+    <div class="tarjeta quiz" id="quiz">
 
-            <h2>¿Cuál fracción representa una cantidad mayor?</h2>
+        <p id="puntaje">⭐ Puntaje: 0</p>
 
-            <p>Observa los dos círculos. Ambos representan enteros del mismo tamaño.</p>
+        <div class="barra-contenedor">
+            <div class="barra" id="barra"></div>
+        </div>
 
-            <div class="fracciones-visuales">
+        <h2 id="pregunta"></h2>
 
-                <div class="opcion-fraccion">
-                    <div class="circulo mitad"></div>
+        <p>
+            Ambos círculos representan enteros del mismo tamaño.
+        </p>
 
-                    <div class="fraccion-grande">
-                        1/2
-                    </div>
+        <div class="fracciones">
 
-                    <button class="boton" onclick="respuestaCorrecta()">
-                        Elegir 1/2
-                    </button>
-                </div>
+            <div class="opcion">
 
-                <div class="opcion-fraccion">
-                    <div class="circulo cuarto"></div>
+                <div id="circulo1" class="circulo"></div>
 
-                    <div class="fraccion-grande">
-                        1/4
-                    </div>
+                <div id="fraccion1" class="fraccion"></div>
 
-                    <button class="boton" onclick="respuestaIncorrecta()">
-                        Elegir 1/4
-                    </button>
-                </div>
+                <button
+                    id="boton1"
+                    class="boton boton-respuesta"
+                    onclick="responder(0)">
+                    Elegir
+                </button>
 
             </div>
 
-            <h2 id="resultado"></h2>
+            <div class="opcion">
+
+                <div id="circulo2" class="circulo"></div>
+
+                <div id="fraccion2" class="fraccion"></div>
+
+                <button
+                    id="boton2"
+                    class="boton boton-respuesta"
+                    onclick="responder(1)">
+                    Elegir
+                </button>
+
+            </div>
 
         </div>
 
-        <p style="text-align:center; margin-top:30px;">
-            <a href="index.html" class="boton">
+        <h2 id="mensaje"></h2>
+
+        <button
+            id="siguiente"
+            class="boton boton-respuesta"
+            onclick="siguientePregunta()"
+            style="display:none">
+
+            Siguiente pregunta ➡️
+
+        </button>
+
+    </div>
+
+</main>
+
+<script>
+
+const preguntas = [
+
+    {
+        a: [1,2],
+        b: [1,4],
+        correcta: 0,
+        explicacion: "1/2 es mayor que 1/4."
+    },
+
+    {
+        a: [3,4],
+        b: [2,4],
+        correcta: 0,
+        explicacion: "3/4 es mayor que 2/4."
+    },
+
+    {
+        a: [1,3],
+        b: [2,3],
+        correcta: 1,
+        explicacion: "2/3 es mayor que 1/3."
+    },
+
+    {
+        a: [2,5],
+        b: [4,5],
+        correcta: 1,
+        explicacion: "4/5 es mayor que 2/5."
+    },
+
+    {
+        a: [3,6],
+        b: [1,6],
+        correcta: 0,
+        explicacion: "3/6 es mayor que 1/6."
+    }
+
+];
+
+let actual = 0;
+let puntaje = 0;
+let respondida = false;
+
+
+function dibujarFraccion(elemento, numerador, denominador) {
+
+    const grados = (numerador / denominador) * 360;
+
+    elemento.style.background =
+        `conic-gradient(
+            #f59e0b 0deg ${grados}deg,
+            white ${grados}deg 360deg
+        )`;
+}
+
+
+function mostrarPregunta() {
+
+    respondida = false;
+
+    const p = preguntas[actual];
+
+    document.getElementById("pregunta").innerHTML =
+        `Pregunta ${actual + 1} de ${preguntas.length}: ¿Cuál fracción es mayor?`;
+
+    document.getElementById("fraccion1").innerHTML =
+        `${p.a[0]}/${p.a[1]}`;
+
+    document.getElementById("fraccion2").innerHTML =
+        `${p.b[0]}/${p.b[1]}`;
+
+
+    dibujarFraccion(
+        document.getElementById("circulo1"),
+        p.a[0],
+        p.a[1]
+    );
+
+
+    dibujarFraccion(
+        document.getElementById("circulo2"),
+        p.b[0],
+        p.b[1]
+    );
+
+
+    document.getElementById("mensaje").innerHTML = "";
+
+    document.getElementById("siguiente").style.display = "none";
+
+    document.getElementById("boton1").disabled = false;
+    document.getElementById("boton2").disabled = false;
+
+
+    const progreso =
+        ((actual + 1) / preguntas.length) * 100;
+
+    document.getElementById("barra").style.width =
+        progreso + "%";
+}
+
+
+function responder(opcion) {
+
+    if (respondida) {
+        return;
+    }
+
+    respondida = true;
+
+    const p = preguntas[actual];
+
+
+    if (opcion === p.correcta) {
+
+        puntaje++;
+
+        document.getElementById("mensaje").innerHTML =
+            "🎉 ¡Correcto! " + p.explicacion;
+
+    }
+
+    else {
+
+        document.getElementById("mensaje").innerHTML =
+            "💡 Aún no. " + p.explicacion;
+
+    }
+
+
+    document.getElementById("puntaje").innerHTML =
+        `⭐ Puntaje: ${puntaje}`;
+
+
+    document.getElementById("boton1").disabled = true;
+    document.getElementById("boton2").disabled = true;
+
+
+    document.getElementById("siguiente").style.display =
+        "inline-block";
+
+
+    if (actual === preguntas.length - 1) {
+
+        document.getElementById("siguiente").innerHTML =
+            "Ver resultado 🏆";
+
+    }
+
+}
+
+
+function siguientePregunta() {
+
+    actual++;
+
+    if (actual < preguntas.length) {
+
+        mostrarPregunta();
+
+    }
+
+    else {
+
+        finalizarQuiz();
+
+    }
+
+}
+
+
+function finalizarQuiz() {
+
+    let mensajeFinal = "";
+    let emoji = "";
+
+
+    if (puntaje === 5) {
+
+        emoji = "🏆";
+
+        mensajeFinal =
+            "¡Excelente! Dominas la comparación de fracciones.";
+
+    }
+
+    else if (puntaje >= 3) {
+
+        emoji = "👏";
+
+        mensajeFinal =
+            "¡Muy buen trabajo! Sigue practicando.";
+
+    }
+
+    else {
+
+        emoji = "💪";
+
+        mensajeFinal =
+            "Buen esfuerzo. Observa nuevamente las representaciones y vuelve a intentarlo.";
+
+    }
+
+
+    document.getElementById("quiz").innerHTML = `
+
+        <div class="resultado-final">
+
+            <h1>${emoji} Resultado final</h1>
+
+            <h2>
+                Obtuviste ${puntaje} de 5 puntos
+            </h2>
+
+            <p>
+                ${mensajeFinal}
+            </p>
+
+            <button
+                class="boton boton-respuesta"
+                onclick="location.reload()">
+
+                🔄 Jugar nuevamente
+
+            </button>
+
+            <br><br>
+
+            <a
+                href="index.html"
+                class="boton">
+
                 🏠 Volver al inicio
+
             </a>
-        </p>
 
-    </main>
+        </div>
 
-    <script>
+    `;
 
-        function respuestaCorrecta() {
-            document.getElementById("resultado").innerHTML =
-            "🎉 ¡Excelente! 1/2 es mayor que 1/4 porque la mitad ocupa una parte mayor del entero.";
-        }
+}
 
-        function respuestaIncorrecta() {
-            document.getElementById("resultado").innerHTML =
-            "💡 Observa nuevamente. Cuando el entero se divide en menos partes iguales, cada parte es más grande.";
-        }
 
-    </script>
+mostrarPregunta();
+
+</script>
 
 </body>
 
